@@ -1,0 +1,46 @@
+version: '3'
+services:
+# 学習のために、laravelstudyについては、サービス名とコンテナ名をわざと違う名前にしている。
+  webzukan-backend:
+  # ビルドするDockerfileがある位置
+    build: ./docker
+    container_name: webzukan_backend
+    # portに関しては、80で実行しないと、"localhost"で開けないので、注意すること!!!
+    ports:
+      - 80:80
+    # volumesの前半は、実行したいプロジェクトのファイルを指定してあげる。 
+    volumes:
+    # 前半に、作成するアプリのソースプロジェクトを参照されるように記載する
+      - .:/var/www/app
+    working_dir: /var/www/app
+  mysql:
+    image: mysql:8.0
+    # M1mac用のplatformの記述
+    platform: linux/amd64
+    container_name: WebZukan_mysql
+    hostname: db-server
+    ports:
+    # 必ず3306で返す
+      - 3308:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: database
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+  phpmyadmin-study:
+    image: phpmyadmin/phpmyadmin
+    container_name: WebZukan_phpmyadmin
+    environment:
+      - PMA_ARBITRARY=1
+      # container_nameの方を入れておく。
+      - PMA_HOST=WebZukan_mysql
+      # mysqlで設定した情報
+      - PMA_USER=user
+      - PMA_PASSWORD=user
+    links:
+      - mysql
+      # port番号に関しては、80で必ず返す
+    ports:
+      - 8484:80
+    volumes:
+      - /sessions

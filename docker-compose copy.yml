@@ -1,0 +1,33 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:8.0
+    # M1mac用のplatformの記述
+    platform: linux/amd64
+    container_name: WebZukan_mysql
+    hostname: db-server
+    ports:
+    # 必ず3306で返す
+      - 3308:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: database
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+  phpmyadmin-study:
+    image: phpmyadmin/phpmyadmin
+    container_name: WebZukan_phpmyadmin
+    environment:
+      - PMA_ARBITRARY=1
+      # container_nameの方を入れておく。
+      - PMA_HOST=WebZukan-backend
+      # mysqlで設定した情報
+      - PMA_USER=user
+      - PMA_PASSWORD=user
+    links:
+      - mysql
+      # port番号に関しては、80で必ず返す
+    ports:
+      - 8484:80
+    volumes:
+      - /sessions
